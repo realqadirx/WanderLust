@@ -7,6 +7,7 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
+const { listingSchema } = require('./schema.js');
 
 let MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -51,14 +52,48 @@ app.get("/listings/:id", wrapAsync(async (req, res) => {
 }));
 
 //Create Route
-app.post("/listings", wrapAsync(async (req, res, next) => {
-    if (!req.body.listing) {
-        throw new ExpressError(400, "Send valid data for listing");
-    }
-    const newListing = new Listing(req.body.listing);
-    await newListing.save()
-    res.redirect("/listings");
-}));
+app.post("/listings", (req, res) => {
+    console.log(req.headers["content-type"]);
+    console.log(req.body);
+
+    res.send("OK");
+});
+
+// app.post("/listings", wrapAsync(async (req, res) => {
+//     console.log("Request Body:", req.body);
+
+//     const result = listingSchema.validate(req.body);
+//     console.log("Validation Result:", result);
+
+//     if (result.error) {
+//         console.log(result.error);
+//         throw new ExpressError(400, result.error.details[0].message);
+//     }
+
+//     const newListing = new Listing(req.body.listing);
+//     console.log("New Listing:", newListing);
+
+//     await newListing.save();
+
+//     res.redirect("/listings");
+// }));
+
+
+// The OG one
+// app.post("/listings", wrapAsync(async (req, res, next) => {
+
+//     const result = listingSchema.validate(req.body);
+
+//     if (result.error) {
+//         throw new ExpressError(400, result.error.details[0].message);
+//     }
+
+//     console.log(result);
+
+//     const newListing = new Listing(req.body.listing);
+//     await newListing.save()
+//     res.redirect("/listings");
+// }));
 
 // Edit Route
 app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
