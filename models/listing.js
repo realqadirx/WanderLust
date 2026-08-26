@@ -35,7 +35,7 @@ const ListingSchema = new mongoose.Schema({
             type: Schema.Types.ObjectId,
             ref: "Review"
         },
-    ]
+    ],
 
 });
 
