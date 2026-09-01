@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js");
-const { listingSchema, reviewSchema } = require('../schema.js');
+const { listingSchema } = require("../schema.js");
 const Listing = require("../models/listing.js");
 
 const ValidateListing = (req, res, next) => {
@@ -35,34 +35,44 @@ router.get("/:id", wrapAsync(async (req, res) => {
 }));
 
 //Create Route
-router.post("/", (req, res) => {
-    console.log(req.headers["content-type"]);
-    console.log(req.body);
-
-    res.send("OK");
-});
+router.post(
+    "/",
+    ValidateListing,
+    wrapAsync(async (req, res, next) => {
+        const newListing = new Listing(req.body.listing);
+        await newListing.save();
+        res.redirect("/listings");
+    })
+);
 
 // Edit Route
-router.get("/:id/edit", wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id);
-    res.render("listings/edit.ejs", { listing });
-}));
+router.get(
+    "/:id/edit",
+    wrapAsync(async (req, res) => {
+        let { id } = req.params;
+        const listing = await Listing.findById(id);
+        res.render("listings/edit.ejs", { listing });
+    }));
 
 //Update Route
-router.put("/:id", wrapAsync(async (req, res) => {
+router.put(
+    "/:id", 
+    ValidateListing,
+    wrapAsync(async (req, res) => {
     let { id } = req.params;
-    await Listing.findByIdAndUpdate(id, req.body.listing);
+    await Listing.findByIdAndUpdate(id,{ ...req.body.listing });
     res.redirect(`/listings/${id}`);
 }));
 
 // Delete Route
-router.delete("/:id", wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    let deletedListing = await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
-    res.redirect("/listings");
-}));
+router.delete(
+    "/:id",
+    wrapAsync(async (req, res) => {
+        let { id } = req.params;
+        let deletedListing = await Listing.findByIdAndDelete(id);
+        console.log(deletedListing);
+        res.redirect("/listings");
+    }));
 
 
 module.exports = router;
