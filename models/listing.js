@@ -38,6 +38,10 @@ const ListingSchema = new mongoose.Schema({
             ref: "Review"
         },
     ],
+    owner : {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
 
 });
 
